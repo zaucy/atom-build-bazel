@@ -1,0 +1,25 @@
+{
+  "name": "build-bazel",
+  "main": "./src/main.js",
+  "version": "0.0.1",
+  "description": "Atom build provider for bazel",
+  "keywords": [],
+  "repository": "https://github.com/zaucy/atom-build-bazel",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {
+    "atom-space-pen-views": "^2.2.0",
+    "chokidar": "^1.7.0",
+    "util.promisify": "^1.0.0"
+  },
+  "providedServices": {
+    "builder": {
+      "description": "Runs bazel",
+      "versions": {
+        "2.0.0": "provideBuilder"
+      }
+    }
+  }
+}
