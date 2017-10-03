@@ -1,7 +1,7 @@
 {
   "name": "build-bazel",
   "main": "./src/main.js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Atom build provider for bazel",
   "keywords": [],
   "repository": "https://github.com/zaucy/atom-build-bazel",
