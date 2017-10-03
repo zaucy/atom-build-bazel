@@ -17,7 +17,8 @@ class BazelBuildProvider extends EventEmitter {
 	constructor(cwd) {
 		super();
 		this.cwd = cwd;
-		this.bazelExec = `E:\\Programs\\bazel-0.6.0-windows-x86_64\\bazel.exe`;
+		// @TODO: Make bazel executable option
+		this.bazelExec = `bazel`;
 		this.bazelTargets = [];
 
 		if(!bazelsRunning[this.cwd]) {
