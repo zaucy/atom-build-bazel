@@ -1,5 +1,5 @@
-# build-bazel package
+# Atom Build Bazel
 
-A short description of your package.
+An [atom build](https://atom.io/packages/build) build provider for [bazel](https://bazel.build/).
 
-![A screenshot of your package](https://f.cloud.github.com/assets/69169/2290250/c35d867a-a017-11e3-86be-cd7c5bf3ff9b.gif)
+![demo](https://user-images.githubusercontent.com/1284289/31110953-6a292ad8-a7bf-11e7-99ae-a5a283026a49.gif)
