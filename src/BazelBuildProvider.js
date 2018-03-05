@@ -58,7 +58,6 @@ class BazelBuildProvider extends EventEmitter {
 		}
 
 		this._refreshTimeout = setTimeout(() => {
-			console.log("refreshing targets...");
 			this.emit("refresh");
 		}, 10);
 	}
@@ -134,7 +133,6 @@ class BazelBuildProvider extends EventEmitter {
 				exec: this.bazelExec,
 				name: "run",
 				preBuild: async function() {
-					console.log(this);
 					let runTargetsView = new RunTargetsView();
 
 					let result = await execBazel(
