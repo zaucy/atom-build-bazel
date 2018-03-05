@@ -70,12 +70,11 @@ class BazelBuildProvider extends EventEmitter {
 			cwd: this.cwd
 		};
 
-		try {
-			result = await execFile(this.bazelExec, args, options);
-		} catch(err) {
+		result = await execFile(this.bazelExec, args, options).catch((err) => {
 			bazelsRunning[this.cwd] -= 1;
-			throw err;
-		}
+			err.bazelArgs = args;
+			return Promise.reject(err);
+		});
 
 		bazelsRunning[this.cwd] -= 1;
 
@@ -107,18 +106,74 @@ class BazelBuildProvider extends EventEmitter {
 		return stats && stats.isFile();
 	}
 
+	settingsError(err) {
+
+		let shortErrMsg = "";
+		let fullErrMsg = "";
+		if(err && err.message) {
+			shortErrMsg = err.message;
+			fullErrMsg = err.message;
+
+			const ERR_MSG_PREFIXES = [
+				"Command failed:",
+				"bazel " + (err.bazelArgs||[]).join(" "),
+				"ERROR:",
+				this.cwd,
+				this.cwd.replace(/\\/g, "/"),
+				"/",
+				"\\"
+			];
+
+			for(let errMsgPrefix of ERR_MSG_PREFIXES) {
+				if(shortErrMsg.toLowerCase().startsWith(errMsgPrefix.toLowerCase())) {
+					shortErrMsg = shortErrMsg.substr(errMsgPrefix.length).trim();
+				}
+			}
+
+			if(shortErrMsg.length > 64) {
+				shortErrMsg = shortErrMsg.substr(0, 64) + " (...)";
+			}
+
+		} else {
+			shortErrMsg = " unknown";
+			console.error("build-bazel bazel unknown error:", err);
+		}
+
+		let echoFullErrMsg = fullErrMsg.replace(/\"/g, "\\\"");
+
+		echoFullErrMsg = echoFullErrMsg.split("\n").map(msg => {
+			return msg ? `echo ${msg} && ` : '';
+		});
+
+		this.bazelTargets = [{
+			exec: `${echoFullErrMsg} exit 1`,
+			name: "<BAZEL ERROR> " + shortErrMsg,
+			cwd: this.cwd,
+		}];
+
+		return this.bazelTargets;
+	}
+
 	async settings() {
 
 		const execBazel = this.execBazel.bind(this);
+		let targetsErr = null;
 
 		const targetsRaw = await this.execBazel(
 			'query',
 			'--noimplicit_deps',
 			'--nohost_deps',
 			`kind('rule', deps(//...))`
-		);
+		).catch(err => {
+			targetsErr = err;
+			return "";
+		});
 
 		this._watch();
+
+		if(targetsErr) {
+			return this.settingsError(targetsErr);
+		}
 
 		const targetNames = targetsRaw.split("\n");
 
